@@ -1,0 +1,38 @@
+{
+  "name": "yreuq.js",
+  "version": "1.0.0",
+  "description": "Common functions and utilities",
+  "scripts": {
+    "test-dev": "mocha --opts ./mocha.opts --watch --bail"
+  },
+  "main": "lib/commonjs/index.js",
+  "module": "lib/module/index.js",
+  "jsnext:main": "lib/module/index.js",
+  "typings": "lib/typings/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "author": "Nathan Ridley <axefrog@gmail.com>",
+  "license": "MIT",
+  "bugs": "https://github.com/frptools/core/issues",
+  "repository": "git@github.com:frptools/core.git",
+  "devDependencies": {
+    "@types/chai": "^3.4.34",
+    "@types/mocha": "^2.2.38",
+    "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^3.0.1",
+    "gulp-plumber": "^1.1.0",
+    "gulp-sourcemaps": "^2.4.0",
+    "gulp-transform": "^1.1.0",
+    "gulp-tslint": "^7.0.1",
+    "gulp-typescript": "^3.1.4",
+    "merge2": "^1.0.3",
+    "mocha": "^3.2.0",
+    "rimraf": "^2.5.4",
+    "source-map-support": "^0.4.11",
+    "tiny-preprocessor": "^1.0.0",
+    "tslint": "^4.4.2",
+    "typescript": "^2.2.1"
+  }
+}
