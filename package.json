@@ -1,7 +1,7 @@
 {
-  "name": "yreuq.js",
+  "name": "@frptools/core",
   "version": "1.0.0",
-  "description": "Common functions and utilities",
+  "description": "Common types, functions and utilities",
   "scripts": {
     "test-dev": "mocha --opts ./mocha.opts --watch --bail"
   },
