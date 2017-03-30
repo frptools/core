@@ -93,15 +93,15 @@ export function blockCopyMapped<T, U>(mapper: MapFn<T, U>, sourceValues: T[], ta
   }
 }
 
-export function blockCopy<T>(sourceValues: T[], targetValues: T[], sourceIndex: number, targetIndex: number, count: number): void {
-  if(sourceValues === targetValues && sourceIndex < targetIndex) {
-    for(var i = sourceIndex + count - 1, j = targetIndex + count - 1, c = 0; c < count; i--, j--, c++) {
-      targetValues[j] = sourceValues[i];
+export function blockCopy<T>(source: T[], destination: T[], sourceIndex: number, destinationIndex: number, count: number): void {
+  if(source === destination && sourceIndex < destinationIndex) {
+    for(var i = sourceIndex + count - 1, j = destinationIndex + count - 1, c = 0; c < count; i--, j--, c++) {
+      destination[j] = source[i];
     }
   }
   else {
-    for(var i = sourceIndex, j = targetIndex, c = 0; c < count; i++, j++, c++) {
-      targetValues[j] = sourceValues[i];
+    for(var i = sourceIndex, j = destinationIndex, c = 0; c < count; i++, j++, c++) {
+      destination[j] = source[i];
     }
   }
 }
