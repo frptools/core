@@ -4,7 +4,7 @@ import * as IMM from '../src/immutability';
 class Person implements IMM.PersistentStructure {
   constructor(
     public readonly name: string,
-    mctx: IMM.MutationContext = IMM.FROZEN
+    mctx: IMM.MutationContext = IMM.frozenContext()
   ) {
     this['@@mctx'] = mctx;
   }
