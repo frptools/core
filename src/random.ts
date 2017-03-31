@@ -5,7 +5,7 @@
 
 // Adapted for TypeScript from Thom's original code at https://github.com/thomcc/pcg-random
 
-import {isNullOrUndefined} from './basic';
+import {isNothing} from './functions';
 
 const defaultIncHi = 0x14057b7e;
 const defaultIncLo = 0xf767814f;
@@ -54,19 +54,19 @@ export class PCGRandom {
    */
   constructor(seedHi: OptionalNumber, seedLo: OptionalNumber, incHi: OptionalNumber, incLo: OptionalNumber);
   constructor(seedHi?: OptionalNumber, seedLo?: OptionalNumber, incHi?: OptionalNumber, incLo?: OptionalNumber) {
-    if(isNullOrUndefined(seedLo) && isNullOrUndefined(seedHi)) {
+    if(isNothing(seedLo) && isNothing(seedHi)) {
       seedLo = (Math.random() * 0xffffffff) >>> 0;
       seedHi = 0;
     }
-    else if(isNullOrUndefined(seedLo)) {
+    else if(isNothing(seedLo)) {
       seedLo = seedHi;
       seedHi = 0;
     }
-    if(isNullOrUndefined(incLo) && isNullOrUndefined(incHi)) {
+    if(isNothing(incLo) && isNothing(incHi)) {
       incLo = this._state ? this._state[3] : defaultIncLo;
       incHi = this._state ? this._state[2] : defaultIncHi;
     }
-    else if(isNullOrUndefined(incLo)) {
+    else if(isNothing(incLo)) {
       incLo = <number>incHi;
       incHi = 0;
     }

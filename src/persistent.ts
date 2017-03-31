@@ -1,4 +1,4 @@
-import {isDefined, error} from './basic';
+import {isDefined, error} from './functions';
 
 /**
  * All persistent structures must implement this interface in order to participate in batches of
@@ -10,7 +10,7 @@ import {isDefined, error} from './basic';
  * @export
  * @interface PersistentStructure
  */
-export interface PersistentStructure {
+export interface Persistent {
   /**
    * The associated mutation context. During construction of the first version of a persistent
    * object, use `immutableContext()` if default immutability is required, or `mutableContext()` if
@@ -20,7 +20,7 @@ export interface PersistentStructure {
    * @type {MutationContext}
    * @memberOf PersistentStructure
    */
-  readonly '@@mctx': MutationContext;
+  readonly '[@mctx]': MutationContext;
 
   /**
    * Create a clone of the structure, retaining all relevant internal properties and state as-is.
@@ -35,7 +35,7 @@ export interface PersistentStructure {
    *
    * @memberOf PersistentStructure
    */
-  '@@clone'(mctx: MutationContext): PersistentStructure;
+  '[@clone]'(mctx: MutationContext): Persistent;
 }
 
 /**
@@ -86,6 +86,18 @@ export class MutationContext {
 const FROZEN = Object.freeze(new MutationContext([false], false));
 
 /**
+ * Checks whether the input object implements the `Persistent` interface, and narrows the input type
+ * accordingly.
+ *
+ * @export
+ * @param {object} value An object instance to test
+ * @returns {value is Persistent} true if the value implements the `Persistent` interface, otherwise false
+ */
+export function isPersistent(value: object): value is Persistent {
+  return '[@mctx]' in <any>value;
+}
+
+/**
  * Returns the default frozen mutation context for use with new immutable objects. This function
  * should only be used when constructing the first version of a new persistent object. Any
  * subsequent copies of that object should use `doneMutating()` and related functions.
@@ -117,7 +129,7 @@ export function mutableContext(): MutationContext {
  * @param {PersistentStructure} value A value to test for mutability
  * @returns {boolean} true if the value may be mutated directly, otherwise false
  */
-export function isMutable(value: PersistentStructure): boolean {
+export function isMutable(value: Persistent): boolean {
   return mctx(value).token[0];
 }
 
@@ -129,7 +141,7 @@ export function isMutable(value: PersistentStructure): boolean {
  * @param {PersistentStructure} value A value to be tested for immutability
  * @returns {boolean} true if direct mutations to the value or its contents are forbidden, otherwise false
  */
-export function isImmutable(value: PersistentStructure): boolean {
+export function isImmutable(value: Persistent): boolean {
   return !isMutable(value);
 }
 
@@ -144,7 +156,7 @@ export function isImmutable(value: PersistentStructure): boolean {
  * @param {PersistentStructure} b A value to compare with `a`
  * @returns {boolean} true if both values are associated with the same active mutation context, otherwise false
  */
-export function isSameMutationContext(a: PersistentStructure, b: PersistentStructure): boolean {
+export function isSameMutationContext(a: Persistent, b: Persistent): boolean {
   var t = token(a);
   return t[0] && t === token(b);
 }
@@ -163,7 +175,7 @@ export function isSameMutationContext(a: PersistentStructure, b: PersistentStruc
  *   the same mutation context as that of the `join` argument
  * @returns {T} A version of the persistent structure that can be freely mutated
  */
-export function asMutable<T extends PersistentStructure>(value: T, join?: PersistentStructure): T {
+export function asMutable<T extends Persistent>(value: T, join?: Persistent): T {
   return isDefined(join)
     ? isSameMutationContext(value, join) ? value : clone(shadow(join), value)
     : isMutable(value) ? value : clone(mutableContext(), value);
@@ -182,12 +194,12 @@ export function asMutable<T extends PersistentStructure>(value: T, join?: Persis
  * @param {T} value A value for which immediate subsequent mutations are no longer intended
  * @returns {T} The input value
  */
-export function doneMutating<T extends PersistentStructure>(value: T): T {
+export function doneMutating<T extends Persistent>(value: T): T {
   var mc = mctx(value);
   return isActive(mc) && isOwner(mc) && freeze(mc), value;
 }
 
-function token(value: PersistentStructure): [boolean] {
+function token(value: Persistent): [boolean] {
   return mctx(value).token;
 }
 
@@ -203,18 +215,18 @@ function isOwner(mctx: MutationContext): boolean {
   return mctx.owner;
 }
 
-function mctx(value: PersistentStructure): MutationContext {
-  var mc = value['@@mctx'];
+function mctx(value: Persistent): MutationContext {
+  var mc = value['[@mctx]'];
   return isDefined(mc) ? mc : FROZEN;
 }
 
-function shadow(value: PersistentStructure): MutationContext {
+function shadow(value: Persistent): MutationContext {
   var mc = mctx(value);
   return isActive(mc)
     ? mc.owner ? new MutationContext(mc.token, false) : mc
     : error('Cannot join a finalized mutation context');
 }
 
-function clone<T extends PersistentStructure>(mctx: MutationContext, value: T): T {
-  return <T>value['@@clone'](mctx);
+function clone<T extends Persistent>(mctx: MutationContext, value: T): T {
+  return <T>value['[@clone]'](mctx);
 }
