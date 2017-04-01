@@ -1,6 +1,6 @@
 {
   "name": "@frptools/core",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Common types, functions and utilities",
   "scripts": {
     "test-dev": "mocha --opts ./mocha.opts --watch --bail"

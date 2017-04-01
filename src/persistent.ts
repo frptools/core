@@ -1,4 +1,4 @@
-import {isDefined, error} from './functions';
+import {isDefined} from './functions';
 
 /**
  * All persistent structures must implement this interface in order to participate in batches of
@@ -157,16 +157,30 @@ export function isImmutable(value: Persistent): boolean {
  * @returns {boolean} true if both values are associated with the same active mutation context, otherwise false
  */
 export function isSameMutationContext(a: Persistent, b: Persistent): boolean {
-  var t = token(a);
-  return t[0] && t === token(b);
+  return token(a) === token(b);
 }
 
 /**
- * Returns a mutable version of the input value. The same value is returned if already mutable and
- * not joining an existing mutation context, or if already associated with the mutation context
- * being joined. If immutable, or already mutable but joining a mutation context other than the one
- * with which it is currently associated, a mutable clone of the value is returned, associated with
- * a new mutation context, or the context associated with the `join` argument, if specified.
+ * Returns a mutable version of the input value. If no joining context is specified, the input value
+ * is returned as-is if already mutable, or cloned to a new mutation context otherwise.
+ *
+ * If a joining context is specified, the return value will use a "shadow" context, i.e. a copy of
+ * the joining context that won't directly trigger refreezing of the shared mutability token when
+ * `doneMutating()` is called. This allows a persistent structure to make multiple modifications to
+ * its internal substructure during a single operation, without unnecessarily re-cloning internal
+ * components over the source of several sub-operations.
+ *
+ * Note that some persistent structures apply partial changes for performance reasons, with the
+ * intent to lazily complete the changes only when accesses to the structure would require those
+ * changes to be applied. Because such internal changes tend to occur after the initial mutations
+ * have finished, and thus the associated mutation context will have become frozen before the lazy
+ * completion of the changes is applied, `asMutable()` can return a shadowed mutation context that
+ * is technically already frozen. In such cases it is still safe to apply changes to the relevant
+ * internal substructures as long as the changes do not change the data, as it is perceived by any
+ * external read operations. When applying lazy updates in this way, do not use `isMutable()`;
+ * instead, just call `asMutable()` naively, with the assumption that what is returned is safe to
+ * update with respect to application of the pending changes that were intended in the prior
+ * operation(s).
  *
  * @export
  * @template T The type of the persistent structure
@@ -177,7 +191,7 @@ export function isSameMutationContext(a: Persistent, b: Persistent): boolean {
  */
 export function asMutable<T extends Persistent>(value: T, join?: Persistent): T {
   return isDefined(join)
-    ? isSameMutationContext(value, join) ? value : clone(shadow(join), value)
+    ? isSameMutationContext(value, join) ? value : clone(shadowMutationContext(join), value)
     : isMutable(value) ? value : clone(mutableContext(), value);
 }
 
@@ -196,15 +210,24 @@ export function asMutable<T extends Persistent>(value: T, join?: Persistent): T 
  */
 export function doneMutating<T extends Persistent>(value: T): T {
   var mc = mctx(value);
-  return isActive(mc) && isOwner(mc) && freeze(mc), value;
+  return isOwner(mc) && freeze(mc), value;
+}
+
+/**
+ * Returns a mutation context that is subordinate to that of the object it was created for. The
+ * returned mutation context matches the mutability of the one from which it is being cloned.
+ *
+ * @export
+ * @param {Persistent} value
+ * @returns {MutationContext}
+ */
+export function shadowMutationContext(value: Persistent): MutationContext {
+  var mc = mctx(value);
+  return mc.owner ? new MutationContext(mc.token, false) : mc;
 }
 
 function token(value: Persistent): [boolean] {
   return mctx(value).token;
-}
-
-function isActive(mctx: MutationContext): boolean {
-  return mctx.token[0];
 }
 
 function freeze(mctx: MutationContext): void {
@@ -216,15 +239,7 @@ function isOwner(mctx: MutationContext): boolean {
 }
 
 function mctx(value: Persistent): MutationContext {
-  var mc = value['[@mctx]'];
-  return isDefined(mc) ? mc : FROZEN;
-}
-
-function shadow(value: Persistent): MutationContext {
-  var mc = mctx(value);
-  return isActive(mc)
-    ? mc.owner ? new MutationContext(mc.token, false) : mc
-    : error('Cannot join a finalized mutation context');
+  return value['[@mctx]'];
 }
 
 function clone<T extends Persistent>(mctx: MutationContext, value: T): T {

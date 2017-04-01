@@ -57,31 +57,28 @@ suite('[Persistent]', () => {
   });
 
   suite('asMutable(join)', () => {
-    test('throws an error if the joined context is already frozen', () => {
-      const bob = new Person('Bob');
-      const sam = new Person('Sam');
-      assert.throws(() => asMutable(sam, bob));
-      assert.throws(() => asMutable(sam, doneMutating(asMutable(sam))));
-    });
-
     test('returns the same instance if already part of the joined context', () => {
       const bob = asMutable(new Person('Bob'));
       const sam = asMutable(new Person('Sam'), bob);
       assert.strictEqual(asMutable(sam, bob), sam);
     });
 
-    test('returns a new instance if not part of the joined context', () => {
+    test('returns a new, mutable instance if not part of the joined context', () => {
       const bob = asMutable(new Person('Bob'));
       const sam = asMutable(new Person('Sam'));
       assert.notStrictEqual(asMutable(sam, bob), sam);
+      assert.isTrue(isMutable(sam));
     });
 
-    test('the returned instance is always mutable', () => {
+    test('if joining an existing context, the returned instance retains the mutability of the join context', () => {
       const bob = asMutable(new Person('Bob'));
       const sam = asMutable(new Person('Sam'), bob);
       const sam2 = asMutable(sam, bob);
       assert.isTrue(isMutable(sam));
       assert.isTrue(isMutable(sam2));
+      doneMutating(bob);
+      const jane = asMutable(new Person('Jane'), bob);
+      assert.isFalse(isMutable(jane));
     });
   });
 
@@ -152,14 +149,6 @@ suite('[Persistent]', () => {
   });
 
   suite('isSameMutationContext()', () => {
-    test('returns false if either structure is attached to a frozen mutation context', () => {
-      assert.isFalse(isSameMutationContext(new Person('Bob'), new Person('Sam')));
-      const bob = asMutable(new Person('Bob'));
-      const sam = asMutable(new Person('Sam'), bob);
-      doneMutating(bob);
-      assert.isFalse(isSameMutationContext(bob, sam));
-    });
-
     test('returns false if the structures are attached to different mutation contexts', () => {
       const bob = asMutable(new Person('Bob'));
       const sam = asMutable(new Person('Sam'));
