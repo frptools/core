@@ -3,6 +3,7 @@ export * from './array';
 export * from './types';
 export * from './random';
 export * from './persistent';
+export * from './changeflag';
 export * from './equatable';
 export * from './comparable';
 export * from './unwrappable';
