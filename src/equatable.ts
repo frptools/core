@@ -1,7 +1,7 @@
-import {isIterable, isObject} from './functions';
+import {isIterable, isObject, isNothing} from './functions';
 
 export interface Equatable {
-  '[@equals]'(other: any): boolean;
+  '@@equals'(other: any): boolean;
 }
 
 /**
@@ -12,7 +12,7 @@ export interface Equatable {
  * @returns {value is Equatable}
  */
 export function isEquatable(value: object): value is Equatable {
-  return '[@equals]' in <any>value;
+  return '@@equals' in <any>value;
 }
 
 /**
@@ -25,9 +25,22 @@ export function isEquatable(value: object): value is Equatable {
  * @param {Equatable} b
  * @returns {boolean} true if both arguments have the same internal
  */
-export function isEqual(a: Equatable, b: Equatable): boolean {
-  if(a === b || (a.constructor === b.constructor && a['[@equals]'](b))) {
+export function isEqual(a: any, b: any): boolean {
+  if(a === b) {
     return true;
+  }
+
+  var na = isNothing(a), nb = isNothing(b);
+  if(na || nb) {
+    return na === nb;
+  }
+
+  if(!isObject(a) || !isObject(b)) {
+    return false;
+  }
+
+  if(isEquatable(a) && isEquatable(b) && a.constructor === b.constructor) {
+    return a['@@equals'](b);
   }
 
   if(isIterable(a) && isIterable(b)) {
@@ -41,12 +54,13 @@ export function isEqual(a: Equatable, b: Equatable): boolean {
       }
       if(!ca.done) {
         var va = ca.value, vb = cb.value;
-        if(va !== vb && !(isObject(va) && isEquatable(va) && isObject(vb) && isEquatable(vb) && isEqual(va, vb))) {
+        if(!isEqual(va, vb)) {
           return false;
         }
       }
     } while(!ca.done);
+    return true;
   }
 
-  return true;
+  return false;
 }

@@ -3,7 +3,7 @@ import {Unwrappable, isUnwrappable, unwrap} from '../src';
 
 class Person implements Unwrappable<any> {
   constructor(private _name: string) {}
-  '[@unwrap]'(): any {
+  '@@unwrap'(): any {
     return {name: this._name};
   }
 }

@@ -76,7 +76,7 @@ export class PCGRandom {
     add64(this._state, this._state[0], this._state[1], <number>seedHi>>>0, <number>seedLo>>>0);
     this._next();
     return this;
-  };
+  }
 
   /**
    * @returns A copy of the internal state of this random number generator as a JavaScript Array
@@ -93,7 +93,7 @@ export class PCGRandom {
     this._state[1] = state[1];
     this._state[2] = state[2];
     this._state[3] = state[3]|1;
-  };
+  }
 
   private _next() {
     // save current state (what we'll use for this number)
@@ -115,10 +115,10 @@ export class PCGRandom {
     var rot = oldHi >>> 27;
     var rot2 = ((-rot >>> 0) & 31) >>> 0;
     return ((xorshifted >>> rot) | (xorshifted << rot2)) >>> 0;
-  };
+  }
 
   /// Get a uniformly distributed 32 bit integer between [0, max).
-  integer(max) {
+  integer(max: number) {
     if(!max) {
       return this._next();
     }
@@ -134,7 +134,7 @@ export class PCGRandom {
       // and is intentionally empty
     }
     return num % max;
-  };
+  }
 
   /// Get a uniformly distributed IEEE-754 double between 0.0 and 1.0, with
   /// 53 bits of precision (every bit of the mantissa is randomized).
@@ -142,7 +142,7 @@ export class PCGRandom {
     var hi = (this._next() & 0x03ffffff) * 1.0;
     var lo = (this._next() & 0x07ffffff) * 1.0;
     return ((hi * BIT_27) + lo) / BIT_53;
-  };
+  }
 }
 
 function mul64(out: Int32Array, aHi: number, aLo: number, bHi: number, bLo: number): void {

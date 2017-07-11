@@ -20,7 +20,7 @@ class Person implements Hashable {
     public age: number
   ) {}
 
-  '[@hash]'(): number {
+  '@@hash'(): number {
     return this.name.length + this.age;
   }
 }
@@ -52,7 +52,7 @@ suite('[Hashable]', () => {
     });
 
     test('returns the same value as hashObject() if an object argument is supplied', () => {
-      const a = [2, 4, 6], b = {a: 128}, c = new Person('Bob', 42), d = new (function Test() {});
+      const a = [2, 4, 6], b = {a: 128}, c = new Person('Bob', 42), d = new (class Test {});
       assert.strictEqual(hash(a), hashObject(a));
       assert.strictEqual(hash(b), hashObject(b));
       assert.strictEqual(hash(c), hashObject(c));
@@ -144,7 +144,7 @@ suite('[Hashable]', () => {
     });
 
     test('returns the same value on successive calls', () => {
-      function Test() {}
+      class Test {}
       const arg = new Test();
       const h = hashObject(arg);
       assert.isNumber(h);

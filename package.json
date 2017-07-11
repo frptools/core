@@ -1,6 +1,6 @@
 {
   "name": "@frptools/core",
-  "version": "2.4.0",
+  "version": "3.0.0",
   "description": "Common types, functions and utilities",
   "scripts": {
     "test-dev": "mocha --opts ./mocha.opts --watch --bail"
@@ -17,22 +17,22 @@
   "bugs": "https://github.com/frptools/core/issues",
   "repository": "git@github.com:frptools/core.git",
   "devDependencies": {
-    "@types/chai": "^3.4.34",
-    "@types/mocha": "^2.2.38",
-    "chai": "^3.5.0",
+    "@types/chai": "^4.0.1",
+    "@types/mocha": "^2.2.41",
+    "chai": "^4.0.2",
     "gulp": "^3.9.1",
-    "gulp-mocha": "^3.0.1",
+    "gulp-mocha": "^4.3.1",
     "gulp-plumber": "^1.1.0",
-    "gulp-sourcemaps": "^2.4.0",
-    "gulp-transform": "^1.1.0",
-    "gulp-tslint": "^7.0.1",
-    "gulp-typescript": "^3.1.4",
-    "merge2": "^1.0.3",
-    "mocha": "^3.2.0",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-transform": "^2.0.0",
+    "gulp-tslint": "^8.1.1",
+    "gulp-typescript": "^3.2.0",
+    "merge2": "^1.1.0",
+    "mocha": "^3.4.2",
     "rimraf": "^2.5.4",
-    "source-map-support": "^0.4.11",
+    "source-map-support": "^0.4.15",
     "tiny-preprocessor": "^1.0.0",
-    "tslint": "^4.4.2",
-    "typescript": "^2.2.1"
+    "tslint": "^5.5.0",
+    "typescript": "^2.4.1"
   }
 }

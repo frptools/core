@@ -1,7 +1,11 @@
+import {Associative} from './types';
+import {isObject} from './functions';
+import {isPersistent} from './mutation';
+
 /**
  * An object that implements `Unwrappable` is capable of serializing itself to a native type, such
  * as a plain object or array. If children of the object will also be unwrapped, implement
- * `NestableUnwrappable` instead, in order to prevent infinite recursion when circular references
+ * `RecursiveUnwrappable` instead, in order to prevent infinite recursion when circular references
  * are encountered during descent.
  *
  * @export
@@ -9,21 +13,21 @@
  * @template T The expected type of the return value
  */
 export interface Unwrappable<T> {
-  '[@unwrap]'(): T;
+  ['@@unwrap'](): T;
 }
 
 /**
- * An object that implements `NestableUnwrappable` is capable of recursively serializing itself and
+ * An object that implements `RecursiveUnwrappable` is capable of recursively serializing itself and
  * its children to a native type, such as a plain object or array.
  *
  * @export
- * @interface NestableUnwrappable
+ * @interface RecursiveUnwrappable
  * @extends {Unwrappable<T>}
  * @template T The type of value being unwrapped
  */
-export interface NestableUnwrappable<T> extends Unwrappable<T> {
-  '[@unwrap]'(target?: T): T;
-  '[@unwrap:init]'(): T;
+export interface RecursiveUnwrappable<T> extends Unwrappable<T> {
+  ['@@unwrapInto'](target: T): T;
+  ['@@createUnwrapTarget'](): T;
 }
 
 /**
@@ -36,20 +40,20 @@ export interface NestableUnwrappable<T> extends Unwrappable<T> {
  * @returns {value is Unwrappable<T>}
  */
 export function isUnwrappable<T>(value: object): value is Unwrappable<T> {
-  return '[@unwrap]' in <any>value;
+  return '@@unwrap' in <any>value;
 }
 
 /**
- * Checks whether the input argument implements the `NestableUnwrappable<T>` interface, and narrows
+ * Checks whether the input argument implements the `RecursiveUnwrappable<T>` interface, and narrows
  * the type accordingly.
  *
  * @export
  * @template T
  * @param {object} value
- * @returns {value is NestableUnwrappable<T>}
+ * @returns {value is RecursiveUnwrappable<T>}
  */
-export function isNestableUnwrappable<T>(value: object): value is NestableUnwrappable<T> {
-  return '[@unwrap:init]' in <any>value;
+export function isRecursiveUnwrappable<T>(value: object): value is RecursiveUnwrappable<T> {
+  return '@@unwrapInto' in <any>value;
 }
 
 const CIRCULARS = new WeakMap<any, any>();
@@ -64,22 +68,63 @@ const CIRCULARS = new WeakMap<any, any>();
  * @param {Unwrappable<T>} value An instance of an object that implements the `Unwrappable` interface
  * @returns {T} An unwrapped (plain) object or value
  */
-export function unwrap<T>(source: any): T {
-  if(!isUnwrappable<T>(source)) {
+export function unwrap(source: any, force?: boolean): any;
+export function unwrap<T = any>(source: T|Unwrappable<T>, force?: boolean): T;
+export function unwrap<T = any>(source: any, force = false): any {
+  if(!isObject(source)) {
     return source;
   }
+
+  if(!isUnwrappable<T>(source)) {
+    if(isPersistent(source) || force) {
+      source = new Unwrapper(source);
+    }
+    else {
+      return source;
+    }
+  }
+
   if(CIRCULARS.has(source)) {
     return CIRCULARS.get(source);
   }
   var value: T;
-  if(isNestableUnwrappable<T>(source)) {
-    var target = source['[@unwrap:init]']();
+  if(isRecursiveUnwrappable<T>(source)) {
+    var target = source['@@createUnwrapTarget']();
     CIRCULARS.set(source, target);
-    value = source['[@unwrap]'](target);
+    value = source['@@unwrapInto'](target);
     CIRCULARS.delete(source);
   }
   else {
-    value = source['[@unwrap]']();
+    value = source['@@unwrap']();
   }
   return value;
+}
+
+class Unwrapper implements RecursiveUnwrappable<Associative> {
+  constructor(public source: Associative) {}
+
+  ['@@unwrap'](): Associative {
+    return this.source;
+  }
+
+  ['@@unwrapInto'](target: Associative): Associative {
+    const keys = Object.getOwnPropertyNames(this.source);
+    for(let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if(key.startsWith('@@') || key.startsWith('_')) continue;
+      target[key] = unwrap(this.source[key]);
+    }
+    return target;
+  }
+
+  ['@@createUnwrapTarget'](): Associative {
+    return {};
+  }
+}
+
+export function unwrapKey(key: any): string {
+  const value = unwrap(key);
+  return isObject(value)
+    ? JSON.stringify(value)
+    : value;
 }

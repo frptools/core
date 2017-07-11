@@ -1,29 +1,17 @@
-import {isPersistent, isImmutable} from './persistent';
+import {isPersistent, isImmutable} from './mutation';
 import {isDefined, isPlain, isIterable} from './functions';
 import {PCGRandom} from './random';
 
 export interface Hashable {
-  '[@hash]'(): number;
+  '@@hash'(): number;
 }
 
 export function isHashable(value: object): value is Hashable {
-  return '[@hash]' in <any>value;
+  return '@@hash' in <any>value;
 }
 
 export function hash(arg: any): number {
-  if(isZero(arg)) return 0;
-  if(typeof arg.valueOf === 'function' && arg.valueOf !== Object.prototype.valueOf) {
-    arg = arg.valueOf();
-    if(isZero(arg)) return 0;
-  }
-  switch(typeof arg) {
-    case 'number': return hashNumber(arg);
-    case 'string': return hashString(arg);
-    case 'function': return hashMiscRef(arg);
-    case 'object': return hashObject(arg);
-    case 'boolean': return arg === true ? 1 : 0;
-    default: return 0;
-  }
+  return opt(_hash(arg));
 }
 
 export function hashArray(arr: any[]): number {
@@ -78,16 +66,32 @@ function randomInt() {
   return RANDOM.integer(0x7FFFFFFF);
 }
 
+function _hash(arg: any): number {
+  if(isZero(arg)) return 0;
+  if(typeof arg.valueOf === 'function' && arg.valueOf !== Object.prototype.valueOf) {
+    arg = arg.valueOf();
+    if(isZero(arg)) return 0;
+  }
+  switch(typeof arg) {
+    case 'number': return _hashNumber(arg);
+    case 'string': return _hashString(arg);
+    case 'function': return _hashMiscRef(arg);
+    case 'object': return _hashObject(arg);
+    case 'boolean': return arg === true ? 1 : 0;
+    default: return 0;
+  }
+}
+
 function _hashArray(arr: any[]): number {
-  var h = 5381;
+  var h = 6151;
   for(var i = 0; i < arr.length; i++) {
-    h = _combineHash(h, hash(arr[i]));
+    h ^= _combineHash(_hashNumber(i), _hash(arr[i]));
   }
   return h;
 }
 
 function _combineHash(a: number, b: number): number {
-  return (a * 33) ^ b;
+  return (a * 53) ^ b;
 }
 
 function _hashObject(value: object): number {
@@ -98,7 +102,7 @@ function _hashObject(value: object): number {
     h = _hashArray(value);
   }
   else if(isHashable(value)) {
-    h = value['[@hash]']();
+    h = value['@@hash']();
   }
   else if(isIterable(value)) {
     h = _hashIterator(value[Symbol.iterator]());
@@ -124,7 +128,7 @@ function _hashMiscRef(o: Object): number {
 }
 
 function _hashIterator(it: Iterator<any>): number {
-  var h = 5381;
+  var h = 6151;
   var current: IteratorResult<any>;
   while(!(current = it.next()).done) {
     h = _combineHash(h, hash(current.value));
@@ -135,10 +139,10 @@ function _hashIterator(it: Iterator<any>): number {
 function _hashPlainObject(o: object): number {
   CACHE.set(o, randomInt());
   var keys = Object.keys(o);
-  var h = 5381;
+  var h = 12289;
   for(var i = 0; i < keys.length; i++) {
     h = _combineHash(h, _hashString(keys[i]));
-    h = _combineHash(h, hash(o[keys[i]]));
+    h = _combineHash(h, hash((o as any)[keys[i]]));
   }
   return h;
 }

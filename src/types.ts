@@ -1,7 +1,21 @@
-export interface Associative<T> {
+import {PersistentStructure} from './Mutation';
+import {Equatable} from './equatable';
+import {Hashable} from './hashable';
+import {Unwrappable, RecursiveUnwrappable} from './unwrappable';
+
+export type concrete = string|number|boolean|symbol|object;
+
+export type defined = concrete|null;
+
+export type Ref<T> = {value: T};
+
+export interface Associative<T = any> {
   [key: string]: T;
   [key: number]: T;
 }
+
+export interface DataStructure<U> extends PersistentStructure, Equatable, Hashable, Unwrappable<U> {}
+export interface RecursiveDataStructure<U> extends PersistentStructure, Equatable, Hashable, RecursiveUnwrappable<U> {}
 
 export type FilterFn<T> = (value: T, index: number) => any;
 

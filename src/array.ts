@@ -1,4 +1,5 @@
 import {MapFn} from './types';
+import {min, max} from './functions';
 
 export function copyArray<T>(values: T[]): T[] {
   if(values.length > 7) {
@@ -81,35 +82,49 @@ export function insertArrayElement<T>(index: number, value: T, array: T[]): T[] 
 
 
 export function blockCopyMapped<T, U>(mapper: MapFn<T, U>, sourceValues: T[], targetValues: U[], sourceIndex: number, targetIndex: number, count: number): void {
+  var i: number, j: number, c: number;
   if(sourceValues === <any>targetValues && sourceIndex < targetIndex) {
-    for(var i = sourceIndex + count - 1, j = targetIndex + count - 1, c = 0; c < count; i--, j--, c++) {
+    for(i = sourceIndex + count - 1, j = targetIndex + count - 1, c = 0; c < count; i--, j--, c++) {
       targetValues[j] = mapper(sourceValues[i], j);
     }
   }
   else {
-    for(var i = sourceIndex, j = targetIndex, c = 0; c < count; i++, j++, c++) {
+    for(i = sourceIndex, j = targetIndex, c = 0; c < count; i++, j++, c++) {
       targetValues[j] = mapper(sourceValues[i], j);
     }
   }
 }
 
 export function blockCopy<T>(source: T[], destination: T[], sourceIndex: number, destinationIndex: number, count: number): void {
+  var i: number, j: number, c: number;
   if(source === destination && sourceIndex < destinationIndex) {
-    for(var i = sourceIndex + count - 1, j = destinationIndex + count - 1, c = 0; c < count; i--, j--, c++) {
+    for(i = sourceIndex + count - 1, j = destinationIndex + count - 1, c = 0; c < count; i--, j--, c++) {
       destination[j] = source[i];
     }
   }
   else {
-    for(var i = sourceIndex, j = destinationIndex, c = 0; c < count; i++, j++, c++) {
+    for(i = sourceIndex, j = destinationIndex, c = 0; c < count; i++, j++, c++) {
       destination[j] = source[i];
     }
   }
 }
 
-export function truncateLeft<T>(values: T[], start: number): T[] {
-  var array = new Array<T>(values.length - start);
-  for(var i = 0, j = start; j < values.length; i++, j++) {
+export function skip<T>(count: number, values: T[]): T[] {
+  var array = new Array<T>(max(0, values.length - count));
+  for(var i = 0, j = count; j < values.length; i++, j++) {
     array[i] = values[j];
   }
   return array;
+}
+
+export function take<T>(count: number, values: T[]): T[] {
+  var array = new Array<T>(min(count, values.length));
+  for(var i = 0; i < values.length; i++) {
+    array[i] = values[i];
+  }
+  return array;
+}
+
+export function last<T>(values: T[]): T {
+  return values[values.length - 1];
 }

@@ -7,7 +7,7 @@ import {
 
 class Jug implements Comparable {
   constructor(public volume: number) {}
-  '[@compare]'(other: Jug): number {
+  '@@compare'(other: Jug): number {
     return this.volume - other.volume;
   }
 }

@@ -50,9 +50,18 @@ export class ChangeFlag {
     this.delta--;
   }
 
-  release(): void {
+  release(): void;
+  release<T>(modified: T, original: T): T;
+  release<T>(modified?: T, original?: T): T {
+    const value = this.confirmed ? modified : original;
     this._parent = ChangeFlag._cache;
     ChangeFlag._cache = this;
+    return value!;
+  }
+
+  reset(): void {
+    this.confirmed = false;
+    this.delta = 0;
   }
 }
 

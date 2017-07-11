@@ -7,7 +7,7 @@ import {
 
 class Person implements Equatable {
   constructor(public name: string) {}
-  '[@equals]'(other: Animal|Person): boolean {
+  '@@equals'(other: Animal|Person): boolean {
     return !!other && this.name === other.name;
   }
 
@@ -18,7 +18,7 @@ class Person implements Equatable {
 
 class Animal implements Equatable {
   constructor(public name: string) {}
-  '[@equals]'(other: Animal|Person): boolean {
+  '@@equals'(other: Animal|Person): boolean {
     return !!other && this.name === other.name;
   }
 
