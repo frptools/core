@@ -35,31 +35,40 @@ export function isEqual(a: any, b: any): boolean {
     return na === nb;
   }
 
-  if(!isObject(a) || !isObject(b)) {
-    return false;
-  }
+  if (isObject(a)) {
+    if (isEquatable(a)) {
+      return a['@@equals'](b);
+    }
 
-  if(isEquatable(a) && isEquatable(b) && a.constructor === b.constructor) {
-    return a['@@equals'](b);
-  }
+    if (!isObject(b)) {
+      return false;
+    }
 
-  if(isIterable(a) && isIterable(b)) {
-    var ita = a[Symbol.iterator]();
-    var itb = b[Symbol.iterator]();
-    do {
-      var ca = ita.next();
-      var cb = itb.next();
-      if(ca.done !== cb.done) {
-        return false;
-      }
-      if(!ca.done) {
-        var va = ca.value, vb = cb.value;
-        if(!isEqual(va, vb)) {
+    if(isEquatable(b)) {
+      return b['@@equals'](a);
+    }
+
+    if(isIterable(a) && isIterable(b)) {
+      var ita = a[Symbol.iterator]();
+      var itb = b[Symbol.iterator]();
+      do {
+        var ca = ita.next();
+        var cb = itb.next();
+        if(ca.done !== cb.done) {
           return false;
         }
-      }
-    } while(!ca.done);
-    return true;
+        if(!ca.done) {
+          var va = ca.value, vb = cb.value;
+          if(!isEqual(va, vb)) {
+            return false;
+          }
+        }
+      } while(!ca.done);
+      return true;
+    }
+  }
+  else if (isObject(b) && isEquatable(b)) {
+    return b['@@equals'](a);
   }
 
   return false;
