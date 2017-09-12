@@ -1,4 +1,4 @@
-import {Associative, ComparatorFn} from './types';
+import {ComparatorFn, Primitive} from './types';
 
 export function isDefined<T>(value: T|undefined): value is T {
   return value !== void 0;
@@ -59,7 +59,9 @@ export function isIterable<T>(value: object): value is Iterable<T> {
  * @param {*} value A value to test
  * @returns {value is Object} true if the value is a non-null object instance
  */
-export function isObject<T = any>(value: any): value is Associative<T> {
+export function isObject<T extends Function>(value: T): false;
+export function isObject<T extends object>(value: T | Primitive): value is T;
+export function isObject(value: any) {
   return typeof value === 'object' && value !== null;
 }
 

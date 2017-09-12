@@ -114,6 +114,19 @@ suite('[Functions]', () => {
 
   suite('isObject()', () => {
     test('returns true if the value is an object type and is not null', () => {
+      // type definition compilation tests:
+      function c () { return 'foo'; }
+      const d = function () { return 'foo'; };
+      const a = 'foo', b = { foo: 'bar' };
+      isObject(a) && a.length;
+      !isObject(a) && a.length;
+      isObject(b) && b.foo;
+      isObject(c) && c.name;
+      !isObject(c) && c.name;
+      isObject(d) && d.name;
+      !isObject(d) && d.name;
+
+      // functional tests:
       assert.isTrue(isObject(new Set()));
       assert.isTrue(isObject({}));
     });

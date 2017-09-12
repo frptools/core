@@ -3,9 +3,11 @@ import {Equatable} from './equatable';
 import {Hashable} from './hashable';
 import {Unwrappable, RecursiveUnwrappable} from './unwrappable';
 
-export type concrete = string|number|boolean|symbol|object;
+export type Concrete = string | number | boolean | symbol | object;
 
-export type defined = concrete|null;
+export type Primitive = string | number | boolean | symbol | null | undefined;
+
+export type Defined = Concrete|null;
 
 export type Ref<T> = {value: T};
 
