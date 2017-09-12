@@ -11,7 +11,8 @@
     "removeComments": false,
     "noUnusedLocals": true,
     "lib": ["dom", "es6", "es7", "es2015"],
-    "outDir": "./.build"
+    "outDir": "./.build",
+    "forceConsistentCasingInFileNames": true
   },
   "include": [
     "./src/**/*.ts",

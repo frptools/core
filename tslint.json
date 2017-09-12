@@ -16,6 +16,7 @@
         "no-unsafe-finally": true,
         "no-var-keyword": false,
         "no-invalid-this": true,
+        "space-before-function-paren": false,
         "one-line": [
             true,
             "check-open-brace",
