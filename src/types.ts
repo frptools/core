@@ -1,4 +1,4 @@
-import {PersistentStructure} from './Mutation';
+import {PersistentStructure} from './mutation';
 import {Equatable} from './equatable';
 import {Hashable} from './hashable';
 import {Unwrappable, RecursiveUnwrappable} from './unwrappable';
