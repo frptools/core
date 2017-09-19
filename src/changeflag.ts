@@ -18,9 +18,9 @@ var SENTINEL: ChangeFlag;
 export class ChangeFlag {
   private static _cache: ChangeFlag;
 
-  static get(): ChangeFlag {
+  static get (): ChangeFlag {
     var next = ChangeFlag._cache;
-    if(next === SENTINEL) {
+    if (next === SENTINEL) {
       next = new ChangeFlag();
     }
     else {
@@ -31,7 +31,7 @@ export class ChangeFlag {
     return next;
   }
 
-  constructor() {
+  constructor () {
     this._parent = SENTINEL;
   }
 
@@ -40,17 +40,17 @@ export class ChangeFlag {
   public confirmed = false;
   public delta = 0;
 
-  public inc() {
+  public inc () {
     this.confirmed = true;
     this.delta++;
   }
 
-  public dec() {
+  public dec () {
     this.confirmed = true;
     this.delta--;
   }
 
-  release(): void;
+  release (): void;
   release<T>(modified: T, original: T): T;
   release<T>(modified?: T, original?: T): T {
     const value = this.confirmed ? modified : original;
@@ -59,7 +59,7 @@ export class ChangeFlag {
     return value!;
   }
 
-  reset(): void {
+  reset (): void {
     this.confirmed = false;
     this.delta = 0;
   }

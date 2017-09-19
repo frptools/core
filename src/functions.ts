@@ -1,18 +1,26 @@
-import {ComparatorFn, Primitive} from './types';
+import { ComparatorFn, Primitive } from './types';
 
-export function isDefined<T>(value: T|undefined): value is T {
+export function isDefined<T>(value: T | undefined): value is T;
+export function isDefined<T>(value: T | undefined): boolean;
+export function isDefined<T>(value: T | undefined) {
   return value !== void 0;
 }
 
-export function isUndefined<T>(value: T|undefined): value is undefined {
+export function isUndefined<T>(value: T | undefined): value is undefined;
+export function isUndefined<T>(value: T | undefined): boolean;
+export function isUndefined<T>(value: T | undefined) {
   return value === void 0;
 }
 
-export function isNull<T>(value: T|null): value is null {
+export function isNull<T>(value: T | null): value is null;
+export function isNull<T>(value: T | null): boolean;
+export function isNull<T>(value: T | null) {
   return value === null;
 }
 
-export function isNotNull<T>(value: T|null): value is T {
+export function isNotNull<T>(value: T | null): value is T;
+export function isNotNull<T>(value: T | null): boolean;
+export function isNotNull<T>(value: T | null) {
   return value !== null;
 }
 
@@ -24,7 +32,9 @@ export function isNotNull<T>(value: T|null): value is T {
  * @param {(T|null|undefined)} value A value to test
  * @returns {(value is null|undefined)} true if the value is null or undefined, otherwise false
  */
-export function isNothing<T>(value: T|null|undefined): value is null|undefined {
+export function isNothing<T>(value: T | null | undefined): value is null | undefined;
+export function isNothing<T>(value: T | null | undefined): boolean;
+export function isNothing<T>(value: T | null | undefined) {
   return value === void 0 || value === null;
 }
 
@@ -36,7 +46,9 @@ export function isNothing<T>(value: T|null|undefined): value is null|undefined {
  * @param {(T|null|undefined)} value A value to test
  * @returns {value is T} false if the value is null or undefined, otherwise true
  */
-export function isNotNothing<T>(value: T|null|undefined): value is T {
+export function isNotNothing<T>(value: T | null | undefined): value is T;
+export function isNotNothing<T>(value: T | null | undefined): boolean;
+export function isNotNothing<T>(value: T | null | undefined) {
   return value !== void 0 && value !== null;
 }
 
@@ -48,7 +60,9 @@ export function isNotNothing<T>(value: T|null|undefined): value is T {
  * @param {*} value A value to check
  * @returns {value is Iterable<T>} true if the argument is iterable
  */
-export function isIterable<T>(value: object): value is Iterable<T> {
+export function isIterable<T>(value: object): value is Iterable<T>;
+export function isIterable<T>(value: object): boolean;
+export function isIterable (value: object) {
   return Symbol.iterator in <any>value;
 }
 
@@ -61,7 +75,8 @@ export function isIterable<T>(value: object): value is Iterable<T> {
  */
 export function isObject<T extends Function>(value: T): false;
 export function isObject<T extends object>(value: T | Primitive): value is T;
-export function isObject(value: any) {
+export function isObject<T extends object>(value: T | Primitive): boolean;
+export function isObject (value: any) {
   return typeof value === 'object' && value !== null;
 }
 
@@ -72,7 +87,9 @@ export function isObject(value: any) {
  * @param {*} value A value to test
  * @returns {value is Object} true if the value is a function
  */
-export function isFunction(value: any): value is Function {
+export function isFunction (value: any): value is Function;
+export function isFunction (value: any): boolean;
+export function isFunction (value: any) {
   return typeof value === 'function';
 }
 
@@ -83,7 +100,9 @@ export function isFunction(value: any): value is Function {
  * @param {*} value A value to test
  * @returns {value is Object} true if the value is a boolean
  */
-export function isBoolean(value: any): value is boolean {
+export function isBoolean (value: any): value is boolean;
+export function isBoolean (value: any): boolean;
+export function isBoolean (value: any) {
   return typeof value === 'boolean';
 }
 
@@ -94,7 +113,9 @@ export function isBoolean(value: any): value is boolean {
  * @param {*} value A value to test
  * @returns {value is Object} true if the value is a string
  */
-export function isString(value: any): value is string {
+export function isString (value: any): value is string;
+export function isString (value: any): boolean;
+export function isString (value: any) {
   return typeof value === 'string';
 }
 
@@ -105,7 +126,9 @@ export function isString(value: any): value is string {
  * @param {*} value A value to test
  * @returns {value is Object} true if the value is a number
  */
-export function isNumber(value: any): value is number {
+export function isNumber (value: any): value is number;
+export function isNumber (value: any): boolean;
+export function isNumber (value: any) {
   return typeof value === 'number';
 }
 
@@ -116,11 +139,13 @@ export function isNumber(value: any): value is number {
  * @param {object} value
  * @returns {value is Object} true if the object's constructor is `Object`
  */
-export function isPlain(value: object): value is object {
+export function isPlain (value: object): value is object;
+export function isPlain (value: object): boolean;
+export function isPlain (value: object) {
   return value.constructor === Object;
 }
 
-export function symbolName(s: Symbol): string {
+export function symbolName (s: Symbol): string {
   var name = s.toString();
   return name.substring(7, name.length - 1);
 }
@@ -133,19 +158,19 @@ export function constant<T>(value: T): () => T {
   return () => value;
 }
 
-export function False() {
+export function False () {
   return false;
 }
 
-export function True() {
+export function True () {
   return true;
 }
 
-export function valueOrDefault<T>(value: T|undefined, defaultValue: T): T {
+export function valueOrDefault<T>(value: T | undefined, defaultValue: T): T {
   return isUndefined(value) ? defaultValue : value;
 }
 
-export function noop(): any {}
+export function noop (): any { }
 
 /**
  * Throws an error with the specified error message
@@ -154,7 +179,7 @@ export function noop(): any {}
  * @param {any} message The error message
  * @returns {never}
  */
-export function error(message: string): never {
+export function error (message: string): never {
   throw new Error(message);
 }
 
@@ -164,7 +189,7 @@ export function error(message: string): never {
  * @export
  * @returns {never}
  */
-export function notImplemented(message?: string): never {
+export function notImplemented (message?: string): never {
   throw Error(`Not implemented${message ? `: ${message}` : ''}`);
 }
 
@@ -175,7 +200,7 @@ export function notImplemented(message?: string): never {
  * @param {number} value
  * @returns {number} The absolute value of the input argument
  */
-export function abs(value: number): number {
+export function abs (value: number): number {
   return value < 0 ? -value : value;
 }
 
@@ -187,7 +212,7 @@ export function abs(value: number): number {
  * @param {number} b
  * @returns {number} The smaller of the two arguments, or the first argument if both are equal
  */
-export function min(a: number, b: number): number {
+export function min (a: number, b: number): number {
   return a <= b ? a : b;
 }
 
@@ -199,15 +224,15 @@ export function min(a: number, b: number): number {
  * @param {number} b
  * @returns {number} The marger of the two arguments, or the first argument if both are equal
  */
-export function max(a: number, b: number): number {
+export function max (a: number, b: number): number {
   return a >= b ? a : b;
 }
 
-export const numericCompare: ComparatorFn<number> = function(a: number, b: number): number {
+export const numericCompare: ComparatorFn<number> = function (a: number, b: number): number {
   return a < b ? -1 : a > b ? 1 : 0;
 };
 
-export const stringCompare: ComparatorFn<string> = function(a: string, b: string): number {
+export const stringCompare: ComparatorFn<string> = function (a: string, b: string): number {
   return a.localeCompare(b);
 };
 

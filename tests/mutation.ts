@@ -1,27 +1,27 @@
 import * as Mutation from '../src/mutation';
-import {assert} from 'chai';
-import {PersistentStructure} from '../src';
+import { assert } from 'chai';
+import { PersistentStructure } from '../src';
 
 class Widget implements PersistentStructure {
-  constructor(public name: string, public component: Component, mctx: Mutation.Context = Mutation.immutable()) {
+  constructor (public name: string, public component: Component, mctx: Mutation.Context = Mutation.immutable()) {
     this['@@mctx'] = mctx;
   }
 
   readonly '@@mctx': Mutation.Context;
 
-  '@@clone'(mctx: Mutation.Context): Widget {
+  '@@clone' (mctx: Mutation.Context): Widget {
     return new Widget(this.name, this.component, mctx);
   }
 }
 
 class Component implements PersistentStructure {
-  constructor(public foo: number = 0, public bar: number = 0, mctx: Mutation.Context = Mutation.immutable()) {
+  constructor (public foo: number = 0, public bar: number = 0, mctx: Mutation.Context = Mutation.immutable()) {
     this['@@mctx'] = mctx;
   }
 
   readonly '@@mctx': Mutation.Context;
 
-  '@@clone'(mctx: Mutation.Context): Component {
+  '@@clone' (mctx: Mutation.Context): Component {
     return new Component(this.foo, this.bar, mctx);
   }
 }

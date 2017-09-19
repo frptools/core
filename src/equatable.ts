@@ -1,7 +1,7 @@
-import {isIterable, isObject, isNothing} from './functions';
+import { isIterable, isObject, isNothing } from './functions';
 
 export interface Equatable {
-  '@@equals'(other: any): boolean;
+  '@@equals' (other: any): boolean;
 }
 
 /**
@@ -11,7 +11,9 @@ export interface Equatable {
  * @param {object} value
  * @returns {value is Equatable}
  */
-export function isEquatable(value: object): value is Equatable {
+export function isEquatable (value: object): value is Equatable;
+export function isEquatable (value: object): boolean;
+export function isEquatable (value: object) {
   return '@@equals' in <any>value;
 }
 
@@ -25,13 +27,13 @@ export function isEquatable(value: object): value is Equatable {
  * @param {Equatable} b
  * @returns {boolean} true if both arguments have the same internal
  */
-export function isEqual(a: any, b: any): boolean {
-  if(a === b) {
+export function isEqual (a: any, b: any): boolean {
+  if (a === b) {
     return true;
   }
 
   var na = isNothing(a), nb = isNothing(b);
-  if(na || nb) {
+  if (na || nb) {
     return na === nb;
   }
 
@@ -44,26 +46,26 @@ export function isEqual(a: any, b: any): boolean {
       return false;
     }
 
-    if(isEquatable(b)) {
+    if (isEquatable(b)) {
       return b['@@equals'](a);
     }
 
-    if(isIterable(a) && isIterable(b)) {
+    if (isIterable(a) && isIterable(b)) {
       var ita = a[Symbol.iterator]();
       var itb = b[Symbol.iterator]();
       do {
         var ca = ita.next();
         var cb = itb.next();
-        if(ca.done !== cb.done) {
+        if (ca.done !== cb.done) {
           return false;
         }
-        if(!ca.done) {
+        if (!ca.done) {
           var va = ca.value, vb = cb.value;
-          if(!isEqual(va, vb)) {
+          if (!isEqual(va, vb)) {
             return false;
           }
         }
-      } while(!ca.done);
+      } while (!ca.done);
       return true;
     }
   }

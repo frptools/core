@@ -10,4 +10,4 @@ export * from './unwrappable';
 export * from './hashable';
 
 import * as Mutation from './mutation';
-export {Mutation};
+export { Mutation };

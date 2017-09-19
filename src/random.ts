@@ -5,7 +5,7 @@
 
 // Adapted for TypeScript from Thom's original code at https://github.com/thomcc/pcg-random
 
-import {isNothing} from './functions';
+import { isNothing } from './functions';
 
 const defaultIncHi = 0x14057b7e;
 const defaultIncLo = 0xf767814f;
@@ -15,7 +15,7 @@ const BIT_53 = 9007199254740992.0;
 const BIT_27 = 134217728.0;
 
 export type PCGRandomState = [number, number, number, number];
-export type OptionalNumber = number|null|undefined;
+export type OptionalNumber = number | null | undefined;
 
 /**
  * PCG is a family of simple fast space-efficient statistically good algorithms for random number generation. Unlike
@@ -31,7 +31,7 @@ export class PCGRandom {
    *
    * @memberOf PCGRandom
    */
-  constructor(seed?: OptionalNumber);
+  constructor (seed?: OptionalNumber);
   /**
    * Creates an instance of PCGRandom.
    *
@@ -41,7 +41,7 @@ export class PCGRandom {
    *
    * @memberOf PCGRandom
    */
-  constructor(seedHi: OptionalNumber, seedLo: OptionalNumber, inc?: OptionalNumber);
+  constructor (seedHi: OptionalNumber, seedLo: OptionalNumber, inc?: OptionalNumber);
   /**
    * Creates an instance of PCGRandom.
    *
@@ -52,28 +52,28 @@ export class PCGRandom {
    *
    * @memberOf PCGRandom
    */
-  constructor(seedHi: OptionalNumber, seedLo: OptionalNumber, incHi: OptionalNumber, incLo: OptionalNumber);
-  constructor(seedHi?: OptionalNumber, seedLo?: OptionalNumber, incHi?: OptionalNumber, incLo?: OptionalNumber) {
-    if(isNothing(seedLo) && isNothing(seedHi)) {
+  constructor (seedHi: OptionalNumber, seedLo: OptionalNumber, incHi: OptionalNumber, incLo: OptionalNumber);
+  constructor (seedHi?: OptionalNumber, seedLo?: OptionalNumber, incHi?: OptionalNumber, incLo?: OptionalNumber) {
+    if (isNothing(seedLo) && isNothing(seedHi)) {
       seedLo = (Math.random() * 0xffffffff) >>> 0;
       seedHi = 0;
     }
-    else if(isNothing(seedLo)) {
+    else if (isNothing(seedLo)) {
       seedLo = seedHi;
       seedHi = 0;
     }
-    if(isNothing(incLo) && isNothing(incHi)) {
+    if (isNothing(incLo) && isNothing(incHi)) {
       incLo = this._state ? this._state[3] : defaultIncLo;
       incHi = this._state ? this._state[2] : defaultIncHi;
     }
-    else if(isNothing(incLo)) {
+    else if (isNothing(incLo)) {
       incLo = <number>incHi;
       incHi = 0;
     }
 
-    this._state = new Int32Array([ 0, 0, <number>incHi >>> 0, ((incLo||0)|1) >>> 0 ]);
+    this._state = new Int32Array([0, 0, <number>incHi >>> 0, ((incLo || 0) | 1) >>> 0]);
     this._next();
-    add64(this._state, this._state[0], this._state[1], <number>seedHi>>>0, <number>seedLo>>>0);
+    add64(this._state, this._state[0], this._state[1], <number>seedHi >>> 0, <number>seedLo >>> 0);
     this._next();
     return this;
   }
@@ -81,21 +81,21 @@ export class PCGRandom {
   /**
    * @returns A copy of the internal state of this random number generator as a JavaScript Array
    */
-  getState(): PCGRandomState {
+  getState (): PCGRandomState {
     return [this._state[0], this._state[1], this._state[2], this._state[3]];
   }
 
   /**
    * Restore state previously retrieved using getState()
    */
-  setState(state: PCGRandomState) {
+  setState (state: PCGRandomState) {
     this._state[0] = state[0];
     this._state[1] = state[1];
     this._state[2] = state[2];
-    this._state[3] = state[3]|1;
+    this._state[3] = state[3] | 1;
   }
 
-  private _next() {
+  private _next () {
     // save current state (what we'll use for this number)
     var oldHi = this._state[0] >>> 0;
     var oldLo = this._state[1] >>> 0;
@@ -118,12 +118,12 @@ export class PCGRandom {
   }
 
   /// Get a uniformly distributed 32 bit integer between [0, max).
-  integer(max: number) {
-    if(!max) {
+  integer (max: number) {
+    if (!max) {
       return this._next();
     }
     max = max >>> 0;
-    if((max & (max - 1)) === 0) {
+    if ((max & (max - 1)) === 0) {
       return this._next() & (max - 1); // fast path for power of 2
     }
 
@@ -138,14 +138,14 @@ export class PCGRandom {
 
   /// Get a uniformly distributed IEEE-754 double between 0.0 and 1.0, with
   /// 53 bits of precision (every bit of the mantissa is randomized).
-  number() {
+  number () {
     var hi = (this._next() & 0x03ffffff) * 1.0;
     var lo = (this._next() & 0x07ffffff) * 1.0;
     return ((hi * BIT_27) + lo) / BIT_53;
   }
 }
 
-function mul64(out: Int32Array, aHi: number, aLo: number, bHi: number, bLo: number): void {
+function mul64 (out: Int32Array, aHi: number, aLo: number, bHi: number, bLo: number): void {
   var c1 = (aLo >>> 16) * (bLo & 0xffff) >>> 0;
   var c0 = (aLo & 0xffff) * (bLo >>> 16) >>> 0;
 
@@ -154,13 +154,13 @@ function mul64(out: Int32Array, aHi: number, aLo: number, bHi: number, bLo: numb
 
   c0 = (c0 << 16) >>> 0;
   lo = (lo + c0) >>> 0;
-  if((lo >>> 0) < (c0 >>> 0)) {
+  if ((lo >>> 0) < (c0 >>> 0)) {
     hi = (hi + 1) >>> 0;
   }
 
   c1 = (c1 << 16) >>> 0;
   lo = (lo + c1) >>> 0;
-  if((lo >>> 0) < (c1 >>> 0)) {
+  if ((lo >>> 0) < (c1 >>> 0)) {
     hi = (hi + 1) >>> 0;
   }
 
@@ -172,10 +172,10 @@ function mul64(out: Int32Array, aHi: number, aLo: number, bHi: number, bLo: numb
 }
 
 // add two 64 bit numbers (given in parts), and store the result in `out`.
-function add64(out: Int32Array, aHi: number, aLo: number, bHi: number, bLo: number): void {
+function add64 (out: Int32Array, aHi: number, aLo: number, bHi: number, bLo: number): void {
   var hi = (aHi + bHi) >>> 0;
   var lo = (aLo + bLo) >>> 0;
-  if((lo >>> 0) < (aLo >>> 0)) {
+  if ((lo >>> 0) < (aLo >>> 0)) {
     hi = (hi + 1) | 0;
   }
   out[0] = hi;

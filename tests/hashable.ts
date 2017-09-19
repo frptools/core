@@ -1,4 +1,4 @@
-import {assert} from 'chai';
+import { assert } from 'chai';
 import {
   Hashable,
   isHashable,
@@ -15,12 +15,12 @@ import {
 } from '../src';
 
 class Person implements Hashable {
-  constructor(
+  constructor (
     public name: string,
     public age: number
-  ) {}
+  ) { }
 
-  '@@hash'(): number {
+  '@@hash' (): number {
     return this.name.length + this.age;
   }
 }
@@ -32,7 +32,7 @@ suite('[Hashable]', () => {
     });
 
     test('returns false if the argument does not implement Hashable', () => {
-      assert.isFalse(isHashable({name: 'Bob', age: 30}));
+      assert.isFalse(isHashable({ name: 'Bob', age: 30 }));
     });
   });
 
@@ -52,7 +52,7 @@ suite('[Hashable]', () => {
     });
 
     test('returns the same value as hashObject() if an object argument is supplied', () => {
-      const a = [2, 4, 6], b = {a: 128}, c = new Person('Bob', 42), d = new (class Test {});
+      const a = [2, 4, 6], b = { a: 128 }, c = new Person('Bob', 42), d = new (class Test { });
       assert.strictEqual(hash(a), hashObject(a));
       assert.strictEqual(hash(b), hashObject(b));
       assert.strictEqual(hash(c), hashObject(c));
@@ -62,9 +62,9 @@ suite('[Hashable]', () => {
 
   suite('hashArray()', () => {
     test('returns different hash values for arrays that contain different sequences of values', () => {
-      const a = hashArray([22, 'test', {a: true}]);
-      const b = hashArray([22, 'TEST', {a: true}]);
-      const c = hashArray([22, 'test', {a: true}, null]);
+      const a = hashArray([22, 'test', { a: true }]);
+      const b = hashArray([22, 'TEST', { a: true }]);
+      const c = hashArray([22, 'test', { a: true }, null]);
       assert.isNumber(a);
       assert.isNumber(b);
       assert.isNumber(c);
@@ -74,8 +74,8 @@ suite('[Hashable]', () => {
     });
 
     test('returns the same hash values for arrays that contain equivalent sequences of values', () => {
-      const a = hashArray([22, 'test', {a: true, x: 789}]);
-      const b = hashArray([22, 'test', {a: true, x: 789}]);
+      const a = hashArray([22, 'test', { a: true, x: 789 }]);
+      const b = hashArray([22, 'test', { a: true, x: 789 }]);
       assert.isNumber(a);
       assert.isNumber(b);
       assert.strictEqual(a, b);
@@ -84,9 +84,9 @@ suite('[Hashable]', () => {
 
   suite('hashArgs()', () => {
     test('returns different hash values for argument lists that contain different sequences of values', () => {
-      const a = hashArgs(22, 'test', {a: true});
-      const b = hashArgs(22, 'TEST', {a: true});
-      const c = hashArgs(22, 'test', {a: true}, null);
+      const a = hashArgs(22, 'test', { a: true });
+      const b = hashArgs(22, 'TEST', { a: true });
+      const c = hashArgs(22, 'test', { a: true }, null);
       assert.isNumber(a);
       assert.isNumber(b);
       assert.isNumber(c);
@@ -96,8 +96,8 @@ suite('[Hashable]', () => {
     });
 
     test('returns the same hash values for argument lists that contain equivalent sequences of values', () => {
-      const a = hashArgs(22, 'test', {a: true, x: 789});
-      const b = hashArgs(22, 'test', {a: true, x: 789});
+      const a = hashArgs(22, 'test', { a: true, x: 789 });
+      const b = hashArgs(22, 'test', { a: true, x: 789 });
       assert.isNumber(a);
       assert.isNumber(b);
       assert.strictEqual(a, b);
@@ -129,22 +129,22 @@ suite('[Hashable]', () => {
     });
 
     test('returns the same value as hashPlainObject() if the argument is a plain object', () => {
-      const arg = {a: true, x: 789};
+      const arg = { a: true, x: 789 };
       assert.strictEqual(hashObject(arg), hashPlainObject(arg));
     });
 
     test('returns the same value as hashArray() if the argument is an array', () => {
-      const arg = [2, 'Bob', {a: true}];
+      const arg = [2, 'Bob', { a: true }];
       assert.strictEqual(hashObject(arg), hashArray(arg));
     });
 
     test('returns the same value as hashIterator() if the argument is iterable', () => {
-      const arg = new Set([2, 'Bob', {a: true}]);
+      const arg = new Set([2, 'Bob', { a: true }]);
       assert.strictEqual(hashObject(arg), hashIterator(arg[Symbol.iterator]()));
     });
 
     test('returns the same value on successive calls', () => {
-      class Test {}
+      class Test { }
       const arg = new Test();
       const h = hashObject(arg);
       assert.isNumber(h);
@@ -155,8 +155,8 @@ suite('[Hashable]', () => {
 
   suite('hashMiscRef()', () => {
     test('returns different hash values for different inputs', () => {
-      const fn1 = function Test() {};
-      const fn2 = function Test() {};
+      const fn1 = function Test () { };
+      const fn2 = function Test () { };
       const a = hashMiscRef(fn1);
       const b = hashMiscRef(fn2);
       assert.isNumber(a);
@@ -169,9 +169,9 @@ suite('[Hashable]', () => {
 
   suite('hashIterator()', () => {
     test('returns different hash values for iterators that output different sequences of values', () => {
-      const a = hashIterator([22, 'test', {a: true}][Symbol.iterator]());
-      const b = hashIterator([22, 'TEST', {a: true}][Symbol.iterator]());
-      const c = hashIterator([22, 'test', {a: true}, null][Symbol.iterator]());
+      const a = hashIterator([22, 'test', { a: true }][Symbol.iterator]());
+      const b = hashIterator([22, 'TEST', { a: true }][Symbol.iterator]());
+      const c = hashIterator([22, 'test', { a: true }, null][Symbol.iterator]());
       assert.isNumber(a);
       assert.isNumber(b);
       assert.isNumber(c);
@@ -181,8 +181,8 @@ suite('[Hashable]', () => {
     });
 
     test('returns the same hash values for iterators that output equivalent sequences of values', () => {
-      const a = hashIterator([22, 'test', {a: true, x: 789}][Symbol.iterator]());
-      const b = hashIterator([22, 'test', {a: true, x: 789}][Symbol.iterator]());
+      const a = hashIterator([22, 'test', { a: true, x: 789 }][Symbol.iterator]());
+      const b = hashIterator([22, 'test', { a: true, x: 789 }][Symbol.iterator]());
       assert.isNumber(a);
       assert.isNumber(b);
       assert.strictEqual(a, b);
@@ -191,9 +191,9 @@ suite('[Hashable]', () => {
 
   suite('hashPlainObject()', () => {
     test('returns different hash values for objects with different sets of keys and values', () => {
-      const a = hashPlainObject({a: 32});
-      const b = hashPlainObject({a: 32, b: 'test'});
-      const c = hashPlainObject({b: 'test'});
+      const a = hashPlainObject({ a: 32 });
+      const b = hashPlainObject({ a: 32, b: 'test' });
+      const c = hashPlainObject({ b: 'test' });
       assert.isNumber(a);
       assert.isNumber(b);
       assert.isNumber(c);
@@ -203,8 +203,8 @@ suite('[Hashable]', () => {
     });
 
     test('returns the same hash values for different objects that have the same keys and values', () => {
-      const a = hashPlainObject({a: 32, b: 'test'});
-      const b = hashPlainObject({a: 32, b: 'test'});
+      const a = hashPlainObject({ a: 32, b: 'test' });
+      const b = hashPlainObject({ a: 32, b: 'test' });
       assert.isNumber(a);
       assert.isNumber(b);
       assert.strictEqual(a, b);

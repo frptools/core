@@ -1,4 +1,4 @@
-import {isUndefined, isObject, isBoolean, error} from './functions';
+import { isUndefined, isObject, isBoolean, error } from './functions';
 
 /**
  * All persistent structures must implement this interface in order to participate in batches of
@@ -35,7 +35,7 @@ export interface PersistentStructure {
    *
    * @memberOf PersistentStructure
    */
-  '@@clone'(mctx: MutationContext): PersistentStructure;
+  '@@clone' (mctx: MutationContext): PersistentStructure;
 }
 
 /**
@@ -77,7 +77,7 @@ export class MutationContext {
    */
   public scope: number;
 
-  constructor(token: [boolean], scope: number) {
+  constructor (token: [boolean], scope: number) {
     this.token = token;
     this.scope = scope;
   }
@@ -95,7 +95,9 @@ export type Context = MutationContext;
  * @param {object} value An object instance to test
  * @returns {value is Persistent} true if the value implements the `Persistent` interface, otherwise false
  */
-export function isPersistent(value: object): value is PersistentStructure {
+export function isPersistent (value: object): value is PersistentStructure;
+export function isPersistent (value: object): boolean;
+export function isPersistent (value: object) {
   return '@@mctx' in <any>value;
 }
 
@@ -104,7 +106,7 @@ const FROZEN = Object.freeze(new MutationContext([false], -1));
 /** A persistent object to become subordinate to (i.e. a mutation batch can only be terminated using the persistent
  * object for which the mutation batch was created), a mutation context to use directly, true to start a new mutable
  * context, or false to ensure that the context is frozen/immutable. */
-export type PreferredContext = PersistentStructure|MutationContext|boolean;
+export type PreferredContext = PersistentStructure | MutationContext | boolean;
 
 export function modify<T extends PersistentStructure>(value: T): T {
   var mc = getMutationContext(value);
@@ -127,7 +129,7 @@ export function commit<T extends PersistentStructure>(value: T): T {
  * modifications directly on a subordinate object has no effect; that object will remain mutable until commit() is
  * called on the context owner (i.e. the object for which the mutable context was originally created).
 */
-export function modifyAsSubordinate<T extends PersistentStructure>(context: PersistentStructure|MutationContext, value: T): T {
+export function modifyAsSubordinate<T extends PersistentStructure>(context: PersistentStructure | MutationContext, value: T): T {
   const mctxChild = getMutationContext(value);
   const mctxParent = isMutationContext(context) ? context : getMutationContext(context);
 
@@ -140,7 +142,7 @@ export function modifyAsSubordinate<T extends PersistentStructure>(context: Pers
 
 /** Returns the second argument as a mutable equal of the first argument (as context owner if the first argument is the
  * context owner or is immutable, or as subordinate if the first argument also has a subordinate context) */
-export function modifyAsEqual<T extends PersistentStructure>(context: PersistentStructure|MutationContext, value: T): T {
+export function modifyAsEqual<T extends PersistentStructure>(context: PersistentStructure | MutationContext, value: T): T {
   const mcChild = getMutationContext(value);
   const mcParent = isMutationContext(context) ? context : getMutationContext(context);
 
@@ -165,15 +167,15 @@ export function modifyAsEqual<T extends PersistentStructure>(context: Persistent
  * @returns {T[P]} A reference to the child object, ready for mutation
  */
 export function modifyProperty<T extends PersistentStructure & {[N in P]: R}, P extends keyof T, R extends PersistentStructure>(parent: T, name: P): T[P] {
-  if(isImmutable(parent)) return error('Cannot modify properties of an immutable object'); // ## DEV ##
+  if (isImmutable(parent)) return error('Cannot modify properties of an immutable object'); // ## DEV ##
   let child = parent[name];
 
-  if(isRelatedContext(getMutationContext(child), getMutationContext(parent))) return child;
+  if (isRelatedContext(getMutationContext(child), getMutationContext(parent))) return child;
   parent[name] = child = clone(child, parent);
   return child;
 }
 
-export function isContextOwner(value: PersistentStructure): boolean {
+export function isContextOwner (value: PersistentStructure): boolean {
   return isPrimaryContext(getMutationContext(value));
 }
 
@@ -188,21 +190,21 @@ export function isContextOwner(value: PersistentStructure): boolean {
  * @param {T} value A value to align with the desired mutability
  * @returns {T} A reference to, or clone of, the `value` argument
  */
-export function withMutability<T extends PersistentStructure>(mutability: PreferredContext|undefined, value: T): T {
+export function withMutability<T extends PersistentStructure>(mutability: PreferredContext | undefined, value: T): T {
   let mctx: MutationContext;
-  if(isUndefined(mutability)) {
+  if (isUndefined(mutability)) {
     mctx = FROZEN;
   }
-  else if(isBoolean(mutability)) {
-    if(mutability === isMutable(value)) return value;
+  else if (isBoolean(mutability)) {
+    if (mutability === isMutable(value)) return value;
     mctx = mutability ? mutable() : FROZEN;
   }
-  else if(isMutationContext(mutability)) {
-    if(isRelatedContext(mutability, getMutationContext(value))) return value;
+  else if (isMutationContext(mutability)) {
+    if (isRelatedContext(mutability, getMutationContext(value))) return value;
     mctx = mutability;
   }
   else {
-    if(areContextsRelated(mutability, value)) return value;
+    if (areContextsRelated(mutability, value)) return value;
     mctx = getSubordinateContext(mutability);
   }
   value = <T>value['@@clone'](mctx);
@@ -217,7 +219,7 @@ export function withMutability<T extends PersistentStructure>(mutability: Prefer
  * @export
  * @returns {MutationContext} The default frozen mutation context
  */
-export function immutable(): MutationContext {
+export function immutable (): MutationContext {
   return FROZEN;
 }
 
@@ -228,8 +230,8 @@ export function immutable(): MutationContext {
  * @export
  * @param {MutationContext} mctx
  */
-export function commitContext(mctx: MutationContext): void {
-  if(isPrimaryContext(mctx)) close(mctx);
+export function commitContext (mctx: MutationContext): void {
+  if (isPrimaryContext(mctx)) close(mctx);
 }
 
 /**
@@ -240,7 +242,7 @@ export function commitContext(mctx: MutationContext): void {
  * @export
  * @returns {MutationContext}
  */
-export function mutable(): MutationContext {
+export function mutable (): MutationContext {
   return new MutationContext([true], 0);
 }
 
@@ -252,14 +254,14 @@ export function mutable(): MutationContext {
  * @export
  * @returns {MutationContext}
  */
-export function selectContext(mutability?: PreferredContext): MutationContext {
+export function selectContext (mutability?: PreferredContext): MutationContext {
   return isUndefined(mutability) ? FROZEN
-       : isBoolean(mutability) ? mutability ? mutable() : FROZEN
-       : isMutationContext(mutability) ? mutability
-       : getSubordinateContext(mutability);
+    : isBoolean(mutability) ? mutability ? mutable() : FROZEN
+      : isMutationContext(mutability) ? mutability
+        : getSubordinateContext(mutability);
 }
 
-export function getMutationContext(value: PersistentStructure): MutationContext {
+export function getMutationContext (value: PersistentStructure): MutationContext {
   return value['@@mctx'];
 }
 
@@ -270,7 +272,9 @@ export function getMutationContext(value: PersistentStructure): MutationContext 
  * @param {*} value
  * @returns {value is MutationContext}
  */
-export function isMutationContext(value: any): value is MutationContext {
+export function isMutationContext (value: any): value is MutationContext;
+export function isMutationContext (value: any): boolean;
+export function isMutationContext (value: any) {
   return isObject(value) && value instanceof MutationContext;
 }
 
@@ -282,7 +286,7 @@ export function isMutationContext(value: any): value is MutationContext {
  * @param {PersistentStructure} value A value to test for mutability
  * @returns {boolean} true if the value may be mutated directly, otherwise false
  */
-export function isMutable(value: PersistentStructure): boolean {
+export function isMutable (value: PersistentStructure): boolean {
   return isMutableContext(getMutationContext(value));
 }
 
@@ -294,15 +298,15 @@ export function isMutable(value: PersistentStructure): boolean {
  * @param {PersistentStructure} value A value to be tested for immutability
  * @returns {boolean} true if direct mutations to the value or its contents are forbidden, otherwise false
  */
-export function isImmutable(value: PersistentStructure): boolean {
+export function isImmutable (value: PersistentStructure): boolean {
   return !isMutable(value);
 }
 
-export function isMutableContext(mctx: MutationContext): boolean {
+export function isMutableContext (mctx: MutationContext): boolean {
   return mctx.token[0];
 }
 
-export function isImmutableContext(mctx: MutationContext): boolean {
+export function isImmutableContext (mctx: MutationContext): boolean {
   return !isMutableContext(mctx);
 }
 
@@ -325,14 +329,14 @@ export function isImmutableContext(mctx: MutationContext): boolean {
  * @param {PersistentStructure} b A value to compare with `a`
  * @returns {boolean} true if both values are associated with the same active mutation context, otherwise false
  */
-export function areContextsRelated(a: PersistentStructure, b: PersistentStructure): boolean {
+export function areContextsRelated (a: PersistentStructure, b: PersistentStructure): boolean {
   // var ta = token(a);
   // var tb = token(b);
   // return ta === tb || (!ta[0] && !tb[0]);
   return token(a) === token(b);
 }
 
-export function hasRelatedContext(mctx: MutationContext, value: PersistentStructure): boolean {
+export function hasRelatedContext (mctx: MutationContext, value: PersistentStructure): boolean {
   return mctx.token === token(value);
 }
 
@@ -380,7 +384,7 @@ export function ensureContext<T extends PersistentStructure>(mctx: MutationConte
  * @param {Persistent} value
  * @returns {MutationContext}
  */
-export function getSubordinateContext(value: PersistentStructure): MutationContext {
+export function getSubordinateContext (value: PersistentStructure): MutationContext {
   return asSubordinateContext(getMutationContext(value));
 }
 
@@ -397,19 +401,19 @@ export function getSubordinateContext(value: PersistentStructure): MutationConte
  * @param {MutationContext} mctx A mutation context for which a subordinate context is required
  * @returns {MutationContext} A subordinate mutation context
  */
-export function asSubordinateContext(mctx: MutationContext): MutationContext {
+export function asSubordinateContext (mctx: MutationContext): MutationContext {
   return mctx.scope >= 0 ? new MutationContext(mctx.token, -1) : mctx;
 }
 
-export function isPrimaryContext(mctx: MutationContext): boolean {
+export function isPrimaryContext (mctx: MutationContext): boolean {
   return mctx.scope >= 0;
 }
 
-export function isSubordinateContext(mctx: MutationContext): boolean {
+export function isSubordinateContext (mctx: MutationContext): boolean {
   return mctx.scope === -1;
 }
 
-function isRelatedContext(a: MutationContext, b: MutationContext): boolean {
+function isRelatedContext (a: MutationContext, b: MutationContext): boolean {
   return a.token === b.token;
 }
 
@@ -430,18 +434,18 @@ export function update<T extends PersistentStructure>(mutate: UpdaterFn<T, any>,
   return commit(value);
 }
 
-function token(value: PersistentStructure): [boolean] {
+function token (value: PersistentStructure): [boolean] {
   return getMutationContext(value).token;
 }
 
-function close(mctx: MutationContext): void {
+function close (mctx: MutationContext): void {
   mctx.token[0] = false;
 }
 
-function incScope(mctx: MutationContext): void {
+function incScope (mctx: MutationContext): void {
   (<any>mctx).scope++;
 }
 
-function decScope(mctx: MutationContext): void {
+function decScope (mctx: MutationContext): void {
   (<any>mctx).scope--;
 }

@@ -1,4 +1,4 @@
-import {assert} from 'chai';
+import { assert } from 'chai';
 import {
   Comparable,
   isComparable,
@@ -6,8 +6,8 @@ import {
 } from '../src';
 
 class Jug implements Comparable {
-  constructor(public volume: number) {}
-  '@@compare'(other: Jug): number {
+  constructor (public volume: number) { }
+  '@@compare' (other: Jug): number {
     return this.volume - other.volume;
   }
 }
@@ -19,7 +19,7 @@ suite('[Comparable]', () => {
     });
 
     test('returns false if the argument does not implement Comparable', () => {
-      assert.isFalse(isComparable({volume: 1}));
+      assert.isFalse(isComparable({ volume: 1 }));
     });
   });
 

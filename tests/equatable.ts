@@ -1,4 +1,4 @@
-import {assert} from 'chai';
+import { assert } from 'chai';
 import {
   Equatable,
   isEquatable,
@@ -6,23 +6,23 @@ import {
 } from '../src';
 
 class Person implements Equatable {
-  constructor(public name: string) {}
-  '@@equals'(other: Animal|Person): boolean {
+  constructor (public name: string) { }
+  '@@equals' (other: Animal | Person): boolean {
     return !!other && this.name === other.name;
   }
 
-  [Symbol.iterator](): Iterator<string> {
+  [Symbol.iterator] (): Iterator<string> {
     return [this.name][Symbol.iterator]();
   }
 }
 
 class Animal implements Equatable {
-  constructor(public name: string) {}
-  '@@equals'(other: Animal|Person): boolean {
+  constructor (public name: string) { }
+  '@@equals' (other: Animal | Person): boolean {
     return !!other && this.name === other.name;
   }
 
-  [Symbol.iterator](): Iterator<string> {
+  [Symbol.iterator] (): Iterator<string> {
     return [this.name][Symbol.iterator]();
   }
 }
@@ -34,7 +34,7 @@ suite('[Equatable]', () => {
     });
 
     test('returns false if the argument does not implement Equatable', () => {
-      assert.isFalse(isEquatable({name: 'Bob'}));
+      assert.isFalse(isEquatable({ name: 'Bob' }));
     });
   });
 

@@ -1,6 +1,6 @@
-import {Associative} from './types';
-import {isObject} from './functions';
-import {isPersistent} from './mutation';
+import { Associative } from './types';
+import { isObject } from './functions';
+import { isPersistent } from './mutation';
 
 /**
  * An object that implements `Unwrappable` is capable of serializing itself to a native type, such
@@ -13,7 +13,7 @@ import {isPersistent} from './mutation';
  * @template T The expected type of the return value
  */
 export interface Unwrappable<T> {
-  ['@@unwrap'](): T;
+  ['@@unwrap'] (): T;
 }
 
 /**
@@ -26,8 +26,8 @@ export interface Unwrappable<T> {
  * @template T The type of value being unwrapped
  */
 export interface RecursiveUnwrappable<T> extends Unwrappable<T> {
-  ['@@unwrapInto'](target: T): T;
-  ['@@createUnwrapTarget'](): T;
+  ['@@unwrapInto'] (target: T): T;
+  ['@@createUnwrapTarget'] (): T;
 }
 
 /**
@@ -39,7 +39,9 @@ export interface RecursiveUnwrappable<T> extends Unwrappable<T> {
  * @param {object} value
  * @returns {value is Unwrappable<T>}
  */
-export function isUnwrappable<T>(value: object): value is Unwrappable<T> {
+export function isUnwrappable<T>(value: object): value is Unwrappable<T>;
+export function isUnwrappable<T>(value: object): boolean;
+export function isUnwrappable (value: object) {
   return '@@unwrap' in <any>value;
 }
 
@@ -52,7 +54,9 @@ export function isUnwrappable<T>(value: object): value is Unwrappable<T> {
  * @param {object} value
  * @returns {value is RecursiveUnwrappable<T>}
  */
-export function isRecursiveUnwrappable<T>(value: object): value is RecursiveUnwrappable<T> {
+export function isRecursiveUnwrappable<T>(value: object): value is RecursiveUnwrappable<T>;
+export function isRecursiveUnwrappable<T>(value: object): boolean;
+export function isRecursiveUnwrappable (value: object) {
   return '@@unwrapInto' in <any>value;
 }
 
@@ -68,15 +72,15 @@ const CIRCULARS = new WeakMap<any, any>();
  * @param {Unwrappable<T>} value An instance of an object that implements the `Unwrappable` interface
  * @returns {T} An unwrapped (plain) object or value
  */
-export function unwrap(source: any, force?: boolean): any;
-export function unwrap<T = any>(source: T|Unwrappable<T>, force?: boolean): T;
+export function unwrap (source: any, force?: boolean): any;
+export function unwrap<T = any>(source: T | Unwrappable<T>, force?: boolean): T;
 export function unwrap<T = any>(source: any, force = false): any {
-  if(!isObject(source)) {
+  if (!isObject(source)) {
     return source;
   }
 
-  if(!isUnwrappable<T>(source)) {
-    if(isPersistent(source) || force) {
+  if (!isUnwrappable<T>(source)) {
+    if (isPersistent(source) || force) {
       source = new Unwrapper(source);
     }
     else {
@@ -84,11 +88,11 @@ export function unwrap<T = any>(source: any, force = false): any {
     }
   }
 
-  if(CIRCULARS.has(source)) {
+  if (CIRCULARS.has(source)) {
     return CIRCULARS.get(source);
   }
   var value: T;
-  if(isRecursiveUnwrappable<T>(source)) {
+  if (isRecursiveUnwrappable<T>(source)) {
     var target = source['@@createUnwrapTarget']();
     CIRCULARS.set(source, target);
     value = source['@@unwrapInto'](target);
@@ -101,28 +105,28 @@ export function unwrap<T = any>(source: any, force = false): any {
 }
 
 class Unwrapper implements RecursiveUnwrappable<Associative> {
-  constructor(public source: Associative) {}
+  constructor (public source: Associative) { }
 
-  ['@@unwrap'](): Associative {
+  ['@@unwrap'] (): Associative {
     return this.source;
   }
 
-  ['@@unwrapInto'](target: Associative): Associative {
+  ['@@unwrapInto'] (target: Associative): Associative {
     const keys = Object.getOwnPropertyNames(this.source);
-    for(let i = 0; i < keys.length; i++) {
+    for (let i = 0; i < keys.length; i++) {
       const key = keys[i];
-      if(key.startsWith('@@') || key.startsWith('_')) continue;
+      if (key.startsWith('@@') || key.startsWith('_')) continue;
       target[key] = unwrap(this.source[key]);
     }
     return target;
   }
 
-  ['@@createUnwrapTarget'](): Associative {
+  ['@@createUnwrapTarget'] (): Associative {
     return {};
   }
 }
 
-export function unwrapKey(key: any): string {
+export function unwrapKey (key: any): string {
   const value = unwrap(key);
   return isObject(value)
     ? JSON.stringify(value)

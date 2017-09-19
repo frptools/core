@@ -1,4 +1,4 @@
-import {assert} from 'chai';
+import { assert } from 'chai';
 import {
   isDefined,
   isUndefined,
@@ -24,7 +24,7 @@ suite('[Functions]', () => {
       assert.isTrue(isDefined(null));
       assert.isTrue(isDefined(0));
       assert.isTrue(isDefined('string'));
-      assert.isTrue(isDefined({obj: 1}));
+      assert.isTrue(isDefined({ obj: 1 }));
     });
 
     test('returns false if the value is undefined', () => {
@@ -42,7 +42,7 @@ suite('[Functions]', () => {
       assert.isFalse(isUndefined(null));
       assert.isFalse(isUndefined(0));
       assert.isFalse(isUndefined('string'));
-      assert.isFalse(isUndefined({obj: 1}));
+      assert.isFalse(isUndefined({ obj: 1 }));
     });
   });
 
@@ -56,7 +56,7 @@ suite('[Functions]', () => {
       assert.isFalse(isNull(void 0));
       assert.isFalse(isNull(0));
       assert.isFalse(isNull('string'));
-      assert.isFalse(isNull({obj: 1}));
+      assert.isFalse(isNull({ obj: 1 }));
     });
   });
 
@@ -66,7 +66,7 @@ suite('[Functions]', () => {
       assert.isTrue(isNotNull(void 0));
       assert.isTrue(isNotNull(0));
       assert.isTrue(isNotNull('string'));
-      assert.isTrue(isNotNull({obj: 1}));
+      assert.isTrue(isNotNull({ obj: 1 }));
     });
 
     test('returns false if the value is null', () => {
@@ -84,7 +84,7 @@ suite('[Functions]', () => {
       assert.isFalse(isNothing(1));
       assert.isFalse(isNothing(0));
       assert.isFalse(isNothing('string'));
-      assert.isFalse(isNothing({obj: 1}));
+      assert.isFalse(isNothing({ obj: 1 }));
     });
   });
 
@@ -98,7 +98,7 @@ suite('[Functions]', () => {
       assert.isTrue(isNotNothing(1));
       assert.isTrue(isNotNothing(0));
       assert.isTrue(isNotNothing('string'));
-      assert.isTrue(isNotNothing({obj: 1}));
+      assert.isTrue(isNotNothing({ obj: 1 }));
     });
   });
 
@@ -139,7 +139,7 @@ suite('[Functions]', () => {
 
   suite('isPlain()', () => {
     test('returns true if the value\'s constructor is Object', () => {
-      assert.isTrue(isPlain({a: 1}));
+      assert.isTrue(isPlain({ a: 1 }));
     });
 
     test('returns false if the value\'s constructor is not Object', () => {
